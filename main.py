@@ -8,6 +8,8 @@ import os
 load_dotenv()
 
 token = os.getenv("DISCORD_TOKEN")
+db_
+
 intents = disc.Intents.default()
 intents.typing = True
 intents.messages = True
@@ -23,6 +25,8 @@ pontos = {}
 @bot.event
 async def on_ready():
     print(f'Bot conectado como {bot.user}')
+
+print("ALOU")
 
 
 @bot.event
