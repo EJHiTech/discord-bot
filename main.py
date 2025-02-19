@@ -5,8 +5,7 @@ from dotenv import load_dotenv
 import asyncpg
 import os
 
-load_dotenv()
-
+load_dotenv(dotenv_path='credentials.env')
 token = os.getenv("DISCORD_TOKEN")
 
 intents = disc.Intents.default()
@@ -16,6 +15,25 @@ intents.presences = False
 intents.members = True
 intents.message_content = True
 
+async def connect_db():
+    try:
+        bot.db = await asyncpg.create_pool(  # Cria o pool de conexões
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
+        )
+        print("✅ Conectado ao banco de dados com pool de conexões!")
+    except Exception as e:
+        print(f"❌ Erro ao conectar ao banco: {e}")
+
+
+if token is None:
+    print("Erro: Token não encontrado.")
+else:
+    print("Token carregado com sucesso!")
+
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 pontos = {}
@@ -24,6 +42,26 @@ pontos = {}
 @bot.event
 async def on_ready():
     print(f'Bot conectado como {bot.user}')
+    await connect_db() 
+
+
+@bot.command(name="ping")
+async def ping(ctx):
+    await ctx.send("Pong!")
+
+
+@bot.command(name="adduser")
+async def adduser(ctx, username: str):
+    try:
+        # Usando o pool de conexões
+        async with bot.db.acquire() as conn:  # Pega uma conexão do pool
+            await conn.execute(
+                "INSERT INTO usuarios (username) VALUES ($1)",
+                username
+            )
+            await ctx.send(f"✅ Usuário `{username}` cadastrado com sucesso!")
+    except Exception as e:
+        await ctx.send(f"❌ Erro ao cadastrar usuário: {e}")
 
 
 
