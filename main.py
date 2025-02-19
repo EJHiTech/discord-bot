@@ -16,6 +16,20 @@ intents.presences = False
 intents.members = True
 intents.message_content = True
 
+async def connect_db():
+    try:
+        bot.db = await asyncpg.connect(
+            database=os.getenv("DB_NAME"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
+        )
+        print("✅ Conectado ao banco de dados!")
+    except Exception as e:
+        print(f"❌ Erro ao conectar ao banco: {e}")
+
+
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 pontos = {}
