@@ -66,4 +66,10 @@ async def relatorio(ctx):
     else:
         await ctx.send(f'{user.mention}, o registro está incompleto ou não registrado.')
 
+
+@bot.command(name='registro')
+async def registro(ctx, *args):
+    nome = ' '.join(args)
+    return nome
+
 bot.run(token)
