@@ -22,6 +22,7 @@ pontos = {}
 horas_em_call = {}
 relatorio_dicionario = {}
 nomes_cadastrados = []
+canais_coworking = {}
 
 
 def formatar_hora(horas):
@@ -47,15 +48,56 @@ async def on_entry(member):
 
 @bot.event
 async def on_voice_state_update(member, before, after):
+    canal_before = before
+    canal_after = after
     if before.channel is None and after.channel:
-        print(f"{member.name} entrou no canal {after.channel.name}")
-        horas_em_call[member.name] = {'entrada' : datetime.now(), 'horas' : None}
+        print(f"{member.id} entrou no canal {after.channel.id}")
+        await entrada_usuario(member, canal_after.channel)
     elif before.channel and after.channel is None:  # Membro saiu do canal
-        print(f"{member.name} saiu do canal {before.channel.name}")
-        entrada = horas_em_call[member.name].get('entrada')
-        horas_em_call[member.name]['horas'] = horas =  datetime.now() - entrada
-        horas_separadas, minutos, segundos = formatar_hora(horas)
-        await member.send(f'Você esteve em call por {horas_separadas:.0f} horas, {minutos:.0f} minutos, {segundos:.0f} segundos')
+        print(f"{member.id} saiu do canal {before.channel.id}")
+        await saida_usuario(member, canal_before.channel)
+
+async def entrada_usuario(member, canal):
+    if canal.id not in canais_coworking:
+        canais_coworking[canal.id] = {}
+    
+    membros_canal = canal.members
+
+    if len(membros_canal) < 2:
+        return
+    
+    if not canais_coworking[canal.id]:
+        for membro in membros_canal:
+            canais_coworking[canal.id][membro.id] = datetime.now()
+        
+        print("coworking iniciado")
+    else:
+        canais_coworking[canal.id][member.id] = datetime.now()
+        print(f'{member.id} adicionado ao coworking')
+
+async def saida_usuario(member, canal):
+    if canal.id not in canais_coworking:
+        return
+    
+    membros_canal = canal.members
+
+    if member.id in canais_coworking[canal.id]:
+        hora_inicio_membro = canais_coworking[canal.id][member.id]
+        tempo_total = datetime.now() - hora_inicio_membro
+        horas, minutos, segundos = formatar_hora(tempo_total)
+        await member.send(f'Você esteve em call por {horas:.0f} horas, {minutos:.0f} minutos, {segundos:.0f} segundos')
+        del canais_coworking[canal.id][member.id]
+    
+    if len(membros_canal) < 2:
+        for membro in membros_canal:
+            if membro.id in canais_coworking[canal.id]:
+                hora_inicio_membro = canais_coworking[canal.id][membro.id]
+                tempo_total = datetime.now() - hora_inicio_membro
+                horas, minutos, segundos = formatar_hora(tempo_total)
+                await membro.send(f'Você esteve em call por {horas:.0f} horas, {minutos:.0f} minutos, {segundos:.0f} segundos')
+                del canais_coworking[canal.id][membro.id]
+        del canais_coworking[canal.id]
+
 
 @bot.command(name='entrada')
 async def entrada(ctx, *args):
