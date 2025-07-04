@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # Instalar as dependências necessárias (incluindo python-dotenv, discord.py, etc)
-RUN pip install discord.py python-dotenv asyncpg
+RUN pip install discord.py python-dotenv asyncpg psycopg2-binary
 
 # Defina o diretório de trabalho dentro do contêiner
 WORKDIR /app
