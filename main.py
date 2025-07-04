@@ -43,6 +43,8 @@ async def on_ready():
 async def on_entry(member):
     try:
         await member.send("Bem vindo.")
+        cargo_registrando = disc.utils.get(member.guild.roles, name="Registrando")
+        await member.add_roles(cargo_registrando)
     except Exception as e:
         print("DEU ERRADO")
 
@@ -148,20 +150,24 @@ async def relatorio(ctx, *args):
 
 @bot.command(name='registro')
 async def registro(ctx, *args):
-    user = ctx.author
-    nome = ' '.join(args)
-    if not nome:
-        await ctx.send(f'{user.mention}, você deve adicionar o seu nome')
-        return None
-    if len(nome) < 2 or len(nome) > 60:
-        await ctx.send(f'{user.mention}, nome deve ter de 2 a 60 letras')
-        return None
-    if nome in nomes_cadastrados:
-        await ctx.send(f'{user.mention}, nome já está cadastrado')
-        return None
-    
-    nomes_cadastrados.append(nome)
-    await ctx.send(f'{user.mention}, registro feito com sucesso')
-    return nome
+    if ctx.channel.name == 'registro':
+        user = ctx.author
+        nome = ' '.join(args)
+        if not nome:
+            await ctx.send(f'{user.mention}, você deve adicionar o seu nome')
+            return None
+        if len(nome) < 2 or len(nome) > 60:
+            await ctx.send(f'{user.mention}, nome deve ter de 2 a 60 letras')
+            return None
+        if nome in nomes_cadastrados:
+            await ctx.send(f'{user.mention}, nome já está cadastrado')
+            return None
+        
+        nomes_cadastrados.append(nome)
+        await ctx.send(f'{user.mention}, registro feito com sucesso')
+        if disc.utils.get(ctx.guild.roles, name="registrando") in user.roles:
+            await user.remove_roles(disc.utils.get(ctx.guild.roles, name="registrando"))
+            await user.add_roles(disc.utils.get(ctx.guild.roles, name="trainee"))
+        return nome
 
 bot.run(token)

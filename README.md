@@ -2,8 +2,10 @@
 
 #instrução de instalação
 
-Para instalar o bot, deve-se entrar no site de desenvolvimento do discord, https://discord.com/developers/applications, logar com a conta do discord e clicar em New Application, dar um nome, clicar em Bot e em seguida Reset Token. Isso gerará um token que serve para rodar o bot com o python. Após gerar o token, copie-o e crie um arquivo .env no projeto e escreva:
+Entre no site de desenvolvimento do discord, https://discord.com/developers/applications, logue com a conta do discord e clique em New Application, dê um nome à aplicação, clique em Bot e em seguida Reset Token. Isso gerará um token que serve para rodar o bot com o python. Após gerar o token, copie-o e crie um arquivo .env no projeto e escreva:
+
 DISCORD_TOKEN= (TOKEN QUE VOCÊ GEROU SEM OS PARÊNTESES)
+
 Em seguida, no site de desenvolvimento ainda na opção bot, você deve marcar as opções PUBLIC BOT, PRESENCE INTENT, SERVER MEMBER INTENT e MESSAGE CONTENT INTENT. Por fim, para adicionar o bot a algum servidor, você deve ir em installation e copiar o link de Install Link e pesquisar no navegador, após isso basta seguir as instruções no navegador.
 
 #instrução para rodar
