@@ -7,7 +7,8 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       TZ: America/Sao_Paulo
     env_file:
@@ -19,12 +20,19 @@ services:
     container_name: db_Bot_HiTech
     environment:
       POSTGRES_USER: "HiTech"
-      POSTGRESS_DB: "DB_BOT_HiTECH"
+      POSTGRES_DB: "DB_BOT_HiTECH"
       POSTGRES_PASSWORD: "HiTechBot2025"
+      POSTGRES_HOST: "db"
     ports:
-    - "5432:5432"
+      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U HiTech -d DB_BOT_HiTECH"]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+      start_period: 10s
 
 volumes:
   pgdata:
